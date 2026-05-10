@@ -1,0 +1,56 @@
+[package]
+name = "ag_id"
+version = "0.1.0"
+edition = "2021"
+authors = ["AuriGlyph <security@auriglyph.com>"]
+description = "Ag^id — deterministic identifiers that survive platform translation"
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/auriglyph/ag-id"
+homepage = "https://auriglyph.com/projects/ag_id"
+documentation = "https://docs.rs/ag_id"
+keywords = ["did", "deterministic", "identifier", "blake3", "no-std"]
+categories = ["cryptography", "no-std", "encoding"]
+readme = "README.md"
+
+[workspace]
+
+[lints.rust]
+unsafe_code = "forbid"
+
+[lints.clippy]
+all = { level = "deny", priority = -1 }
+pedantic = { level = "warn", priority = -1 }
+nursery = { level = "warn", priority = -1 }
+unwrap_used = "deny"
+todo = "deny"
+panic = "deny"
+
+[features]
+default = ["std"]
+std = []
+# Optional `serde` impls — `Did` serialises as the canonical
+# `did:agid:<base58>` string (or 32-byte array in non-human-readable formats).
+serde = ["dep:serde"]
+
+[dependencies]
+blake3 = { version = "1.5", default-features = false }
+serde = { version = "1", optional = true, default-features = false, features = ["derive"] }
+
+[dev-dependencies]
+criterion = { version = "0.5", features = ["html_reports"] }
+proptest = "1"
+serde_json = "1"
+
+[[bench]]
+name = "throughput"
+harness = false
+
+[[example]]
+name = "basic"
+
+[[example]]
+name = "parsing"
+
+[package.metadata.docs.rs]
+all-features = true
+rustdoc-args = ["--cfg", "docsrs"]

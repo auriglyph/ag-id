@@ -1,0 +1,22 @@
+# Build artefacts
+/target
+
+# Library crate — Cargo.lock is intentionally not tracked
+# (re-resolves on every consumer's `cargo build`).
+Cargo.lock
+
+# Local environment / secrets
+.env
+
+# Project-rule archive folder
+_archive/
+
+# macOS junk
+.DS_Store
+._*
+
+# Editor / IDE
+*.swp
+*.swo
+.idea/
+.vscode/

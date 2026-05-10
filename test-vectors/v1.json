@@ -1,0 +1,106 @@
+{
+  "spec_version": "1",
+  "comment": "Canonical Ag^id (ag_id) v1 test vectors. Any conforming implementation in any language MUST reproduce these byte-for-byte. Inputs are given as ASCII strings; treat them as their UTF-8 byte sequence.",
+  "protocol": {
+    "prefix": "agid:v1:",
+    "hash": "BLAKE3-256",
+    "encoding": "base58 (Bitcoin alphabet, no 0/O/I/l)",
+    "uri_prefix": "did:agid:"
+  },
+  "domain_bytes": {
+    "User":     "0x01",
+    "Document": "0x02",
+    "Session":  "0x03",
+    "Device":   "0x04",
+    "Concept":  "0x05",
+    "Opaque":   "0x00 (reserved sentinel — never used to derive)"
+  },
+  "vectors": [
+    {
+      "name": "user_alice_at_example",
+      "domain": "User",
+      "domain_byte": "0x01",
+      "input_utf8": "alice@example.com",
+      "raw_hex": "1a2fdea0f9612c18e110ea43eb149d397f997a730d93ca2d8e1178835d9e1925",
+      "did_string": "did:agid:2mDwJhrvWdJsqHAhRTQWpaLgWmnTZxEZJv6hnDmjiYtt"
+    },
+    {
+      "name": "user_architect_at_auriglyph",
+      "domain": "User",
+      "domain_byte": "0x01",
+      "input_utf8": "architect@auriglyph.com",
+      "raw_hex": "f059a4033cab314f4f2e6bf324aab351e29a6265f7de02c28b8742e300903462",
+      "did_string": "did:agid:HBE8KJPc2ehjFFkY5tAd1dEBminESfjWMHed5VK26n5F"
+    },
+    {
+      "name": "golden_v1_anchor",
+      "comment": "Stability anchor — MUST match across all v1.x releases. The Rust integration test tests/determinism.rs::did__derive__golden_input__matches_hardcoded_hex pins this raw_hex value.",
+      "domain": "User",
+      "domain_byte": "0x01",
+      "input_utf8": "agid:golden:v1",
+      "raw_hex": "7c62f564159188295c2eb1b4fa3b67edb81c21b07b53d21b040f1a03340de849",
+      "did_string": "did:agid:9NZ5Hr3TjTUMCZcx7yAUmVgvjKiXAYPGWk99jBsXqeTJ"
+    },
+    {
+      "name": "empty_input_user",
+      "comment": "Empty input is allowed and well-defined.",
+      "domain": "User",
+      "domain_byte": "0x01",
+      "input_utf8": "",
+      "raw_hex": "971734801ac0437067ac7f521b422a0e4619ef7e7ff2d15bb6adf5da0f7b7058",
+      "did_string": "did:agid:BAo5w7gcSBMsLqYRqDEJ7pVuj5MQM8W567A5cWmyCUcf"
+    },
+    {
+      "name": "unicode_cyrillic",
+      "comment": "Hash is over UTF-8 bytes (\"Михаил\" → 0xd09c d0b8 d185 d0b0 d0b8 d0bb in UTF-8). Encoding identity is the caller's responsibility.",
+      "domain": "User",
+      "domain_byte": "0x01",
+      "input_utf8": "Михаил",
+      "raw_hex": "38f12866493850cbe71cbe622551bda534945321f7ed3ebd27364b986911fcf5",
+      "did_string": "did:agid:4qH7WfFHC1fcaczryBD9mHXC1Jc8PDYcWGmwdNvVr7QY"
+    },
+    {
+      "name": "domain_separation_user",
+      "comment": "Pair with `domain_separation_document` and `domain_separation_session` — same input, different domains, must produce different IDs.",
+      "domain": "User",
+      "domain_byte": "0x01",
+      "input_utf8": "same-input",
+      "raw_hex": "32bd40b0c58f71e094bb6f278fb39e6d01faa4826e59416fea77d9bdd71f5658",
+      "did_string": "did:agid:4R4m8n9tdzRXdMEPV2pbyWwdnX8mDyavKo68A7etME5m"
+    },
+    {
+      "name": "domain_separation_document",
+      "domain": "Document",
+      "domain_byte": "0x02",
+      "input_utf8": "same-input",
+      "raw_hex": "b8b7595855b3a25023ef241757c35b5913f2532889ac8e360f26d89efc4a2799",
+      "did_string": "did:agid:DS4AvqeTHmgHxPAHKjX3ZBLKHYqkerj5gwSUwBbXXPKW"
+    },
+    {
+      "name": "domain_separation_session",
+      "domain": "Session",
+      "domain_byte": "0x03",
+      "input_utf8": "same-input",
+      "raw_hex": "e256b85b39e02bd0b1251820b7bd4a295d757d302c2e1a86cc937b415a1201cd",
+      "did_string": "did:agid:GEXqTNt4cvGMtwatn1y7KLyor19nLexU8UMGyvJ1QsQQ"
+    },
+    {
+      "name": "custom_domain_0xff",
+      "comment": "Custom domain with byte 0xFF.",
+      "domain": "Custom",
+      "domain_byte": "0xff",
+      "input_utf8": "some-input",
+      "raw_hex": "2eb5364a26c6dbee6b5716d18d5356d42b5e7b8644c481f277c54396fc7751a4",
+      "did_string": "did:agid:49L26pAbHYxQpENhZT7qmMLCYJhmUeg2HaBJPsBuL2su"
+    },
+    {
+      "name": "long_input_1024_zeros",
+      "comment": "1024 bytes of 0x00. Verifies that BLAKE3 is fed the bytes verbatim with no length-prefix tampering.",
+      "domain": "Document",
+      "domain_byte": "0x02",
+      "input_utf8": "(1024 bytes of 0x00 — see Rust generator tests/vector_export.rs)",
+      "raw_hex": "b0f561357d041b2220fbf570abb85966081db915b2b6480b83b5844236edb810",
+      "did_string": "did:agid:Cummes8JKskjxa73rshacP3DTdvFo3eweuWGYcqvaTaw"
+    }
+  ]
+}
