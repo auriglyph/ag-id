@@ -5,7 +5,7 @@
 //! The output is consumed by `test-vectors/v1.json` and any re-implementation
 //! in another language.
 
-use ag_id::{Did, Domain};
+use ag_id::{DeriveDomain, Did};
 
 fn hex(bytes: &[u8; 32]) -> String {
     use core::fmt::Write as _;
@@ -19,60 +19,60 @@ fn hex(bytes: &[u8; 32]) -> String {
 #[derive(Clone, Copy)]
 struct V {
     name: &'static str,
-    domain: Domain,
+    domain: DeriveDomain,
     input: &'static [u8],
 }
 
 const VECTORS: &[V] = &[
     V {
         name: "user_alice_at_example",
-        domain: Domain::User,
+        domain: DeriveDomain::User,
         input: b"alice@example.com",
     },
     V {
         name: "user_architect_at_auriglyph",
-        domain: Domain::User,
+        domain: DeriveDomain::User,
         input: b"architect@auriglyph.com",
     },
     V {
         name: "golden_v1_anchor",
-        domain: Domain::User,
+        domain: DeriveDomain::User,
         input: b"agid:golden:v1",
     },
     V {
         name: "empty_input_user",
-        domain: Domain::User,
+        domain: DeriveDomain::User,
         input: b"",
     },
     V {
         name: "unicode_cyrillic",
-        domain: Domain::User,
+        domain: DeriveDomain::User,
         // UTF-8 bytes for "Михаил"
         input: "Михаил".as_bytes(),
     },
     V {
         name: "domain_separation_user",
-        domain: Domain::User,
+        domain: DeriveDomain::User,
         input: b"same-input",
     },
     V {
         name: "domain_separation_document",
-        domain: Domain::Document,
+        domain: DeriveDomain::Document,
         input: b"same-input",
     },
     V {
         name: "domain_separation_session",
-        domain: Domain::Session,
+        domain: DeriveDomain::Session,
         input: b"same-input",
     },
     V {
         name: "custom_domain_0xff",
-        domain: Domain::Custom(0xFF),
+        domain: DeriveDomain::Custom(core::num::NonZeroU8::MAX),
         input: b"some-input",
     },
     V {
         name: "long_input_1024_zeros",
-        domain: Domain::Document,
+        domain: DeriveDomain::Document,
         input: &[0u8; 1024],
     },
 ];

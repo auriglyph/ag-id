@@ -2,11 +2,11 @@
 
 #![cfg(feature = "serde")]
 
-use ag_id::{Did, Domain};
+use ag_id::{DeriveDomain, Did, Domain};
 
 #[test]
 fn json_roundtrip() {
-    let original = Did::derive(Domain::User, b"alice@example.com");
+    let original = Did::derive(DeriveDomain::User, b"alice@example.com");
     let s = serde_json::to_string(&original).expect("serialize");
     // JSON: a string starting with did:agid:
     assert!(s.starts_with("\"did:agid:"));
@@ -24,7 +24,7 @@ fn json_in_struct() {
         name: String,
     }
     let r = Record {
-        id: Did::derive(Domain::User, b"alice@example.com"),
+        id: Did::derive(DeriveDomain::User, b"alice@example.com"),
         name: "alice".into(),
     };
     let s = serde_json::to_string(&r).expect("serialize");

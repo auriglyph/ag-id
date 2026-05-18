@@ -2,7 +2,7 @@
 
 **The same input always produces the same identifier. On every platform. Stable across the v1.x line.**
 
-For input `(Domain::User, b"alice@example.com")`:
+For input `(DeriveDomain::User, b"alice@example.com")`:
 
 ```text
 did:agid:2mDwJhrvWdJsqHAhRTQWpaLgWmnTZxEZJv6hnDmjiYtt  ← Linux x86-64
@@ -37,18 +37,18 @@ ag_id = "0.1"
 ```
 
 ```rust
-use ag_id::{Did, Domain};
+use ag_id::{DeriveDomain, Did};
 
 // Derive an identifier
-let id = Did::derive(Domain::User, b"alice@example.com");
+let id = Did::derive(DeriveDomain::User, b"alice@example.com");
 println!("{}", id); // did:agid:2mDwJhrvWdJsqHAhRTQWpaLgWmnTZxEZJv6hnDmjiYtt
 
 // Same input, same result — every time, everywhere
-let id2 = Did::derive(Domain::User, b"alice@example.com");
+let id2 = Did::derive(DeriveDomain::User, b"alice@example.com");
 assert_eq!(id, id2);
 
 // Different domains → different IDs (even with same input)
-let doc_id = Did::derive(Domain::Document, b"alice@example.com");
+let doc_id = Did::derive(DeriveDomain::Document, b"alice@example.com");
 assert_ne!(id, doc_id);
 
 // Round-trip through the wire form
@@ -131,10 +131,11 @@ Read these before using `Ag^id` in security-sensitive contexts.
   If `input` is sensitive (e.g. an email address), the resulting `Did` is a
   stable pseudonym for that input forever. There is no server-side
   invalidation. Hash inputs you control, not raw PII, when this matters.
-- **Domain separation is enforced by discipline.** `Domain::Custom(b)` lets
-  callers pick any byte; if two systems pick the same byte for different
-  semantics, their IDs collide by design. Reserve `0x01..=0x05` for the
-  built-in variants and document your custom-byte allocations.
+- **Custom domain separation is enforced by discipline.**
+  `DeriveDomain::custom(b)` lets callers pick any non-zero byte; if two systems
+  pick the same byte for different semantics, their IDs collide by design.
+  Reserve `0x01..=0x05` for the built-in variants and document your
+  custom-byte allocations.
 - **Not for adversarial uniqueness.** A determined attacker can grind inputs
   until two map to the same prefix substring. The full 32-byte ID resists
   this, but **truncated** displays do not. Never truncate a `Did` for

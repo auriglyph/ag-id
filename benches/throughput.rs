@@ -1,6 +1,6 @@
 //! Benchmarks for `ag_id` (Ag^id).
 
-use ag_id::{derive, Domain};
+use ag_id::{derive, DeriveDomain};
 use criterion::{black_box, criterion_group, criterion_main, Criterion, Throughput};
 
 /// Benchmark `derive` with various input sizes.
@@ -13,7 +13,7 @@ fn bench_derive(c: &mut Criterion) {
         g.bench_with_input(
             criterion::BenchmarkId::from_parameter(size),
             &input,
-            |b, input| b.iter(|| derive(black_box(Domain::User), black_box(input))),
+            |b, input| b.iter(|| derive(black_box(DeriveDomain::User), black_box(input))),
         );
     }
     g.finish();
@@ -21,7 +21,7 @@ fn bench_derive(c: &mut Criterion) {
 
 /// Benchmark display formatting of `Did`.
 fn bench_display(c: &mut Criterion) {
-    let id = derive(Domain::User, b"bench-display");
+    let id = derive(DeriveDomain::User, b"bench-display");
     c.bench_function("display/did_string", |b| {
         b.iter(|| black_box(id.to_string()));
     });

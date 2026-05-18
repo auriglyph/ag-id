@@ -3,10 +3,10 @@
 //! Run with:
 //!   cargo run --example parsing
 
-use ag_id::{Did, Domain};
+use ag_id::{DeriveDomain, Did};
 
 fn main() {
-    let typed = Did::derive(Domain::User, b"alice@example.com");
+    let typed = Did::derive(DeriveDomain::User, b"alice@example.com");
     let s = typed.to_did_string();
     println!("produced:  {s}");
 

@@ -88,6 +88,9 @@ A subtle decision: parsing `did:agid:<base58>` recovers the 32 raw bytes but **n
 
 This is the right trade-off: the *byte identity* is what callers actually need from a serialised ID. Domain context is recovered from the surrounding code (the database column, the JSON field name), not from the bytes.
 
+Derivation APIs accept `DeriveDomain`, not `Domain`, so the `Opaque` sentinel and
+the reserved byte `0x00` cannot enter the v1 hash input path.
+
 ### Allocation strategy: zero on the hot path
 
 `Did::derive` does not allocate. `to_hex_array` returns a stack `[u8; 64]`. `to_base58` returns a stack `([u8; 44], usize)`. Only `to_did_string` and the optional `serde` impl allocate, and only because they return `String` for ergonomics.
