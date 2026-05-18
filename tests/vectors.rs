@@ -1,10 +1,10 @@
 #![allow(non_snake_case)]
 //! Cross-platform test vectors for `ag_id` (Ag^id).
 
-use ag_id::{Did, Domain};
+use ag_id::{DeriveDomain, Did};
 
 struct Vector {
-    domain: Domain,
+    domain: DeriveDomain,
     input: &'static [u8],
     /// Expected did:agid:... string.
     expected: &'static str,
@@ -13,7 +13,7 @@ struct Vector {
 #[test]
 fn did__derive__cross_platform_vectors__match_hardcoded_values() {
     let vectors = [Vector {
-        domain: Domain::User,
+        domain: DeriveDomain::User,
         input: b"alice@example.com",
         expected: "did:agid:2mDwJhrvWdJsqHAhRTQWpaLgWmnTZxEZJv6hnDmjiYtt",
     }];
@@ -31,7 +31,7 @@ fn did__derive__cross_platform_vectors__match_hardcoded_values() {
 
 #[test]
 fn did__display__format__is_stable_base58() {
-    let id = Did::derive(Domain::User, b"format-test");
+    let id = Did::derive(DeriveDomain::User, b"format-test");
     let s = id.to_string();
     // DID URI scheme
     assert!(s.starts_with("did:agid:"));

@@ -1,6 +1,6 @@
 use crate::{
     derive::raw,
-    domain::Domain,
+    domain::{DeriveDomain, Domain},
     encode::{from_base58_to_32, to_base58, to_hex},
     error::Error,
 };
@@ -28,24 +28,24 @@ pub struct Did {
 }
 
 impl Did {
-    /// Derive a new `Did` from a domain and arbitrary input bytes.
+    /// Derive a new `Did` from a derivation domain and arbitrary input bytes.
     ///
     /// This is the primary constructor. It is deterministic, side-effect-free,
     /// and produces the same result on every platform.
     ///
     /// ```rust
-    /// use ag_id::{Did, Domain};
+    /// use ag_id::{DeriveDomain, Did};
     ///
-    /// let a = Did::derive(Domain::User, b"hello");
-    /// let b = Did::derive(Domain::User, b"hello");
+    /// let a = Did::derive(DeriveDomain::User, b"hello");
+    /// let b = Did::derive(DeriveDomain::User, b"hello");
     /// assert_eq!(a, b);
     /// ```
     #[inline]
     #[must_use]
-    pub fn derive(domain: Domain, input: &[u8]) -> Self {
+    pub fn derive(domain: DeriveDomain, input: &[u8]) -> Self {
         Self {
             raw: raw(domain.as_byte(), input),
-            domain,
+            domain: domain.into(),
         }
     }
 
@@ -53,8 +53,8 @@ impl Did {
     ///
     /// # Example
     /// ```rust
-    /// use ag_id::{Did, Domain};
-    /// let id = Did::derive(Domain::User, b"test");
+    /// use ag_id::{DeriveDomain, Did};
+    /// let id = Did::derive(DeriveDomain::User, b"test");
     /// let bytes = id.as_bytes();
     /// assert_eq!(bytes.len(), 32);
     /// ```
@@ -68,8 +68,8 @@ impl Did {
     ///
     /// # Example
     /// ```rust
-    /// use ag_id::{Did, Domain};
-    /// let id = Did::derive(Domain::User, b"test");
+    /// use ag_id::{DeriveDomain, Did, Domain};
+    /// let id = Did::derive(DeriveDomain::User, b"test");
     /// assert_eq!(id.domain(), Domain::User);
     /// ```
     #[inline]
@@ -82,8 +82,8 @@ impl Did {
     ///
     /// # Example
     /// ```rust
-    /// use ag_id::{Did, Domain};
-    /// let id = Did::derive(Domain::User, b"test");
+    /// use ag_id::{DeriveDomain, Did};
+    /// let id = Did::derive(DeriveDomain::User, b"test");
     /// let hex = id.to_hex_array();
     /// assert_eq!(hex.len(), 64);
     /// ```
@@ -100,8 +100,8 @@ impl Did {
     /// ```rust
     /// # #[cfg(feature = "std")]
     /// # {
-    /// use ag_id::{Did, Domain};
-    /// let id = Did::derive(Domain::User, b"test");
+    /// use ag_id::{DeriveDomain, Did};
+    /// let id = Did::derive(DeriveDomain::User, b"test");
     /// let s = id.to_did_string();
     /// assert!(s.starts_with("did:agid:"));
     /// # }
@@ -129,8 +129,8 @@ impl Did {
     ///
     /// # Example
     /// ```rust
-    /// use ag_id::{Did, Domain};
-    /// let original = Did::derive(Domain::User, b"alice");
+    /// use ag_id::{DeriveDomain, Did, Domain};
+    /// let original = Did::derive(DeriveDomain::User, b"alice");
     /// let opaque = Did::from_bytes(*original.as_bytes());
     /// assert!(opaque.eq_bytes(&original));
     /// assert_eq!(opaque.domain(), Domain::Opaque);
@@ -161,8 +161,8 @@ impl Did {
     /// ```rust
     /// # #[cfg(feature = "std")]
     /// # {
-    /// use ag_id::{Did, Domain};
-    /// let typed = Did::derive(Domain::User, b"alice");
+    /// use ag_id::{DeriveDomain, Did};
+    /// let typed = Did::derive(DeriveDomain::User, b"alice");
     /// let s = typed.to_did_string();
     /// let parsed = Did::parse(&s).expect("round-trip");
     /// assert!(parsed.eq_bytes(&typed));
@@ -188,8 +188,8 @@ impl Did {
     ///
     /// # Example
     /// ```rust
-    /// use ag_id::{Did, Domain};
-    /// let typed = Did::derive(Domain::User, b"x");
+    /// use ag_id::{DeriveDomain, Did};
+    /// let typed = Did::derive(DeriveDomain::User, b"x");
     /// let opaque = Did::from_bytes(*typed.as_bytes());
     /// assert!(typed.eq_bytes(&opaque));
     /// // PartialEq compares both fields, so direct equality fails:

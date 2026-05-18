@@ -1,17 +1,17 @@
 //! Property tests — invariants that must hold for arbitrary inputs.
 
-use ag_id::{Did, Domain};
+use ag_id::{DeriveDomain, Did, Domain};
 use proptest::prelude::*;
 
-fn arb_domain() -> impl Strategy<Value = Domain> {
+fn arb_domain() -> impl Strategy<Value = DeriveDomain> {
     prop_oneof![
-        Just(Domain::User),
-        Just(Domain::Document),
-        Just(Domain::Session),
-        Just(Domain::Device),
-        Just(Domain::Concept),
+        Just(DeriveDomain::User),
+        Just(DeriveDomain::Document),
+        Just(DeriveDomain::Session),
+        Just(DeriveDomain::Device),
+        Just(DeriveDomain::Concept),
         // Custom: any non-zero byte (0x00 is the Opaque sentinel).
-        (1u8..=255).prop_map(Domain::Custom),
+        (1u8..=255).prop_map(|b| DeriveDomain::custom(b).expect("non-zero domain")),
     ]
 }
 
@@ -37,8 +37,8 @@ proptest! {
     fn different_domains_differ(
         input in any::<Vec<u8>>(),
     ) {
-        let a = Did::derive(Domain::User, &input);
-        let b = Did::derive(Domain::Document, &input);
+        let a = Did::derive(DeriveDomain::User, &input);
+        let b = Did::derive(DeriveDomain::Document, &input);
         prop_assert_ne!(a.as_bytes(), b.as_bytes());
     }
 

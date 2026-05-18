@@ -5,22 +5,23 @@
 //! the equivalent assertion. If this test fails, either the JSON is wrong
 //! or the implementation changed in a way that breaks the v1.x contract.
 
-use ag_id::{Did, Domain};
+use ag_id::{DeriveDomain, Did};
 
-fn parse_domain(name: &str, domain_byte_str: &str) -> Domain {
+fn parse_domain(name: &str, domain_byte_str: &str) -> DeriveDomain {
     match name {
-        "User" => Domain::User,
-        "Document" => Domain::Document,
-        "Session" => Domain::Session,
-        "Device" => Domain::Device,
-        "Concept" => Domain::Concept,
+        "User" => DeriveDomain::User,
+        "Document" => DeriveDomain::Document,
+        "Session" => DeriveDomain::Session,
+        "Device" => DeriveDomain::Device,
+        "Concept" => DeriveDomain::Concept,
         "Custom" => {
             let trimmed = domain_byte_str
                 .trim_start_matches("0x")
                 .trim_start_matches("0X");
             let byte = u8::from_str_radix(trimmed, 16)
                 .unwrap_or_else(|_| panic!("bad domain_byte: {domain_byte_str}"));
-            Domain::Custom(byte)
+            DeriveDomain::custom(byte)
+                .unwrap_or_else(|_| panic!("bad domain_byte: {domain_byte_str}"))
         }
         other => panic!("unknown domain in JSON: {other}"),
     }
