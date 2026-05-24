@@ -20,3 +20,8 @@ _archive/
 *.swo
 .idea/
 .vscode/
+.phi/
+
+# Python witness artefacts (conformance/witnesses/python/)
+__pycache__/
+*.pyc

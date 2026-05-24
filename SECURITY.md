@@ -36,6 +36,46 @@ We treat the following as security defects:
 - Any way to reach the BLAKE3 hasher with a domain byte that is not the
   one the caller supplied.
 
+## Linkability across systems
+
+Determinism is the protocol's purpose, and also its main misuse risk.
+
+If two independent systems run `derive(DeriveDomain::User, alice@example.com)`,
+they produce **the same** `did:agid:...`. This is the feature: that is how
+two parties can refer to the same entity without exchanging keys. It is
+also the failure mode: an attacker who observes the public `Did` from one
+system can recompute, on their own machine, what input produced it — and
+then trivially link the same person across every other system that uses
+`ag_id`.
+
+For low-entropy inputs (emails, usernames, phone numbers, account numbers,
+IBANs, government IDs) this means: **the `Did` is not a one-way function in
+practice**. It is one-way for high-entropy inputs only.
+
+### Recommended pattern for sensitive inputs
+
+If your input has fewer than ~80 bits of entropy and you need
+unlinkability across deployments, do not feed it directly into `derive`.
+Wrap it under a deployment-local secret first:
+
+```text
+secret_input  =  HMAC-BLAKE3(K_deployment, raw_user_input)
+did           =  ag_id::derive(domain, secret_input)
+```
+
+`K_deployment` is a 32-byte secret held by the deploying system and never
+shipped with the data. Different deployments produce different `Did`s for
+the same `raw_user_input`, so cross-deployment linkability is broken. This
+also prevents recovery of `raw_user_input` from a leaked `Did` without
+access to `K_deployment`.
+
+`ag_id` does not provide this wrapper itself: doing so would mean keeping a
+secret, which contradicts the crate's zero-state invariant. The wrapper
+belongs at the caller layer.
+
+A worked example will be added under `examples/hmac_wrapping.rs` —
+tracked as `H-4` in [`docs/CLAIMS_LEDGER.md`](docs/CLAIMS_LEDGER.md).
+
 ## Reporting
 
 Report suspected vulnerabilities to <security@auriglyph.com>. Please include
