@@ -1,0 +1,84 @@
+name: CI
+
+on:
+  push:
+    branches: [main, "protocol-maturity-*"]
+  pull_request:
+    branches: [main]
+
+env:
+  CARGO_TERM_COLOR: always
+  RUSTFLAGS: "-D warnings"
+
+jobs:
+  rust:
+    name: Rust ${{ matrix.toolchain }} on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest]
+        toolchain: [stable]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: ${{ matrix.toolchain }}
+          components: rustfmt, clippy
+
+      - name: Cache cargo registry and target
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: ${{ runner.os }}-${{ matrix.toolchain }}-cargo-${{ hashFiles('**/Cargo.toml') }}
+          restore-keys: |
+            ${{ runner.os }}-${{ matrix.toolchain }}-cargo-
+
+      - name: cargo fmt --check
+        run: cargo fmt --all --check
+
+      - name: cargo clippy (all features)
+        run: cargo clippy --all-features --all-targets -- -D warnings
+
+      - name: cargo test (all features)
+        run: cargo test --all-features
+
+      - name: cargo test --no-default-features --lib (no_std build smoke)
+        run: cargo test --no-default-features --lib
+
+      - name: cargo doc (all features, no deps)
+        run: cargo doc --all-features --no-deps
+        env:
+          RUSTDOCFLAGS: "-D warnings"
+
+      - name: cargo package --list (sanity)
+        run: cargo package --list --allow-dirty
+
+  python-witness:
+    name: Independent Python witness (conformance)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install blake3
+        run: pip install blake3
+
+      - name: Run Python witness against test-vectors/v1.json
+        run: python3 conformance/witnesses/python/agid_v1_witness.py
+
+  conformance-agreement:
+    name: Rust and Python agree
+    needs: [rust, python-witness]
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "Rust integration test and Python witness both passed against test-vectors/v1.json."

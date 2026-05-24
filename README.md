@@ -96,9 +96,13 @@ That's it. No state. No clock. No random. Pure function.
 
 - `no_std` compatible (default: `std` feature enabled)
 - Zero heap allocations in the hot path
-- BLAKE3: faster than SHA-256, better than SHA-3
-- W3C DID URI format: `did:agid:<base58>`
-- Cross-platform by construction
+- BLAKE3-256 hash; `Hasher::new()` (unkeyed) mode only
+- Wire form is a W3C DID URI ABNF–conformant string (`did:agid:<base58>`); a
+  W3C DID method registration, resolver, and DID Document layer are tracked
+  on the roadmap but are not implemented in this crate today (see
+  [`DESIGN.md` §6](DESIGN.md#6-what-is-not-yet-implemented))
+- Cross-platform by construction (verified by independent Python witness in
+  [`conformance/`](conformance/))
 
 ---
 
@@ -114,6 +118,37 @@ derive/16     time: [67.2 ns]   throughput: [227.0 MiB/s]
 derive/1024   time: [833.4 ns]  throughput: [1.14 GiB/s]
 derive/65536  time: [9.96 µs]   throughput: [6.13 GiB/s]
 ```
+
+---
+
+## What this crate is and is not
+
+**This crate is:**
+
+- A deterministic identifier primitive: pure function `(domain, input) → 32 bytes`.
+- A canonical wire form: `did:agid:<base58>`, conforming to the W3C DID URI ABNF.
+- A domain-separated derivation scheme: same input in different `DeriveDomain`s
+  produces different identifiers, enforced by the protocol prefix and the
+  1-byte domain in the hash input.
+- A portable, protocol-style spec with cross-language test vectors in
+  [`test-vectors/v1.json`](test-vectors/v1.json) and an independent Python
+  witness in [`conformance/`](conformance/).
+
+**This crate is not (yet):**
+
+- A registered W3C DID method. The `agid` name has not been submitted to the
+  [W3C DID Method registry](https://www.w3.org/TR/did-spec-registries/);
+  submission is on the [roadmap](ROADMAP.md).
+- A DID resolver. There is no function returning a structured `DidDocument`
+  from a `did:agid:` URI in this crate today.
+- A full DID Document layer. No JSON-LD context, no `service` arrays, no
+  `verificationMethod` arrays.
+- An authentication, credentials, signing, or attestation system. `Did` is a
+  name, not a credential — it proves nothing about who computed it. Do not
+  use `==` between `Did` values as a proof of control or possession.
+- An encryption scheme. Ag^id does not encrypt anything. The only security
+  property is collision resistance from BLAKE3-256 and domain separation
+  from the 8-byte prefix plus 1-byte domain.
 
 ---
 
@@ -167,7 +202,8 @@ at your option.
 - [`SECURITY.md`](SECURITY.md) — threat model and disclosure policy.
 - [`BENCHMARKS.md`](BENCHMARKS.md) — methodology + environment block.
 - [`CONTRIBUTING.md`](CONTRIBUTING.md) — how to send patches.
-- [`test-vectors/v1.json`](test-vectors/v1.json) — canonical cross-language vectors.
+- [`test-vectors/v1.json`](test-vectors/v1.json) — canonical cross-language vectors (positive + negative cases).
+- [`conformance/README.md`](conformance/README.md) — conformance suite overview and how to add a new-language witness.
 
 ---
 

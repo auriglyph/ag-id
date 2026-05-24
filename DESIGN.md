@@ -91,6 +91,56 @@ This is the right trade-off: the *byte identity* is what callers actually need f
 Derivation APIs accept `DeriveDomain`, not `Domain`, so the `Opaque` sentinel and
 the reserved byte `0x00` cannot enter the v1 hash input path.
 
+### Why `DeriveDomain` and `Domain` are separate types
+
+The crate exposes two enums that look similar at first glance. The split is
+deliberate:
+
+- `DeriveDomain` is the **input type** for `Did::derive`. It cannot represent
+  `Opaque`, and its `Custom(NonZeroU8)` rejects `0x00` at the type level
+  (`NonZeroU8::new(0)` returns `None`, so `DeriveDomain::custom(0)` returns
+  `Err(Error::ReservedDomain)` without reaching the hash). This means the v1
+  hash input path is **structurally incapable** of feeding the reserved byte
+  to BLAKE3.
+- `Domain` is the **observation type** attached to a `Did` value. It includes
+  the same five built-ins plus `Custom(u8)` and `Opaque`. `Opaque` exists
+  because parsing `did:agid:<base58>` must produce a `Did` whose original
+  derivation domain is no longer known.
+
+A single enum cannot serve both roles without either weakening the type-system
+guarantee on the derive path (`Custom(u8)` including `0`) or amputating the
+parsed-value state (no `Opaque`). The two types are the cheapest way to keep
+both promises simultaneously.
+
+### What `Domain::Opaque` actually means
+
+`Domain::Opaque` is the type-level encoding of "this `Did` was reconstructed
+from a wire form — the original derivation domain is unrecoverable." It maps
+to the reserved byte `0x00`, which the protocol forbids as a derivation input
+(see SPEC.md §3). The mapping is consistent across three layers:
+
+- **Type layer.** `Opaque` is a sentinel `Domain` variant.
+- **Byte layer.** Byte `0x00` is reserved.
+- **Protocol layer.** No `(domain_byte, input) → raw` derivation may target
+  `domain_byte = 0x00`.
+
+This tri-layer invariant is the design's way of saying "we have a
+type-system-visible state for unresolved provenance, and that state cannot
+collide with any derivation."
+
+### Reserved byte `0x00`
+
+Reserving a single byte from the start of the domain space costs one slot
+(255 remain) and buys two properties at once:
+
+- A sentinel for the unresolved-domain state.
+- A failure-safe value for a future v2 protocol that might want to indicate
+  "this is not a v1 derivation" without ambiguity.
+
+Other deterministic-identifier schemes that did not reserve such a byte have
+had to reintroduce it later as a magic value. Doing it on day one is cheaper
+than doing it after adoption.
+
 ### Allocation strategy: zero on the hot path
 
 `Did::derive` does not allocate. `to_hex_array` returns a stack `[u8; 64]`. `to_base58` returns a stack `([u8; 44], usize)`. Only `to_did_string` and the optional `serde` impl allocate, and only because they return `String` for ergonomics.
@@ -151,6 +201,59 @@ To stay small and trustworthy:
 - No truncation. We never display fewer than the full 32 bytes of meaning.
 
 If you need any of these, layer them on top — but they are not in the trust boundary of this crate.
+
+### Rejected alternatives at the design level
+
+These were considered as the project's overall shape and rejected. Listed here
+so the rejection is visible:
+
+- **A database sequence with a UUID-style identifier.** Requires a central
+  authority. Two offline parties cannot agree on the same identifier. Defeats
+  the determinism premise.
+- **A full identity platform** (key management, authentication, attestations,
+  revocation lists). Ag^id is a name primitive. Adding an authentication or
+  attestation layer would force the trust boundary to grow far beyond a pure
+  hash function, which is the property that makes Ag^id auditable in a single
+  reading.
+- **A random short-form identifier with a server-side mapping** (e.g.
+  shortener-style). Reintroduces the central authority and a database. The
+  generated short form is not derivable from the inputs.
+- **Multibase / multihash encoding.** Lets each producer pick the encoding.
+  The wire form ceases to be canonical and "this is the v1 form" becomes
+  "this is one of several v1 forms," which defeats deterministic
+  identifier-equality across sender and receiver.
+- **A blockchain-anchored identifier.** Requires a chain. Adds resolution
+  latency. Couples the lifecycle of the identifier to the operational
+  lifecycle of the chain. None of these costs buy anything for a pure
+  deterministic-name use case.
+
+---
+
+## 6. What is NOT yet implemented
+
+The crate at v0.1.x ships the deterministic-derivation primitive and the
+`did:agid:` URI form. The ecosystem layer that a complete W3C DID method
+requires is **not in this crate today**. Specifically:
+
+- **No DID resolver.** The current code has `Did::parse` (URI → bytes) but no
+  function returning a structured `DidDocument`. Resolution to a DID Document
+  is tracked in [`ROADMAP.md`](ROADMAP.md) under "Post-1.0".
+- **No DID Document type.** There is no `DidDocument` struct, no JSON-LD
+  serialisation of the resolved form, no service or verificationMethod
+  arrays.
+- **No JSON-LD context.** The URL `https://auriglyph.com/projects/ag_id/contexts/v1`
+  is referenced from ROADMAP but is not yet hosted.
+- **No registered W3C DID method.** The `agid` method name has not been
+  submitted to the [W3C DID Method registry](https://www.w3.org/TR/did-spec-registries/).
+  Submission is on the roadmap; it is a multi-month process.
+- **No verifiable-credentials integration.** Ag^id is a name primitive, not a
+  credential. Use it as the subject identifier of a credential issued by some
+  other system; do not use it to authenticate anything.
+- **No verification CLI.** A standalone `agid-verify` binary that re-derives
+  from `(domain, input, expected_did)` triples is tracked in ROADMAP.
+
+Honest framing of these gaps belongs in the project's claims. See README's
+"What this crate is and is not" section.
 
 ---
 

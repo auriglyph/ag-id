@@ -1,6 +1,6 @@
 {
   "spec_version": "1",
-  "comment": "Canonical Ag^id (ag_id) v1 test vectors. Any conforming implementation in any language MUST reproduce these byte-for-byte. Inputs are given as ASCII strings; treat them as their UTF-8 byte sequence.",
+  "comment": "Canonical Ag^id (ag_id) v1 test vectors. Any conforming implementation in any language MUST reproduce the positive vectors byte-for-byte AND reject the negative cases as specified. Inputs are given as ASCII strings; treat them as their UTF-8 byte sequence.",
   "protocol": {
     "prefix": "agid:v1:",
     "hash": "BLAKE3-256",
@@ -102,5 +102,78 @@
       "raw_hex": "b0f561357d041b2220fbf570abb85966081db915b2b6480b83b5844236edb810",
       "did_string": "did:agid:Cummes8JKskjxa73rshacP3DTdvFo3eweuWGYcqvaTaw"
     }
-  ]
+  ],
+  "negative_cases": {
+    "comment": "Conforming implementations MUST reject these inputs. Error names are the Rust reference's enum variants (ag_id::Error). Other-language implementations should use equivalent typed-error semantics.",
+    "derivation_rejections": [
+      {
+        "name": "reserved_domain_zero",
+        "comment": "Derivation with domain_byte = 0x00 is reserved for Opaque and must be rejected at construction. The Rust type system also prevents this at compile time (DeriveDomain has no Opaque variant and DeriveDomain::custom(0) returns Error::ReservedDomain).",
+        "domain_byte": "0x00",
+        "expected_error": "ReservedDomain"
+      }
+    ],
+    "parse_rejections": [
+      {
+        "name": "missing_prefix_plain_string",
+        "comment": "A string with no DID-shape at all.",
+        "input_string": "not a did at all",
+        "expected_error": "MissingPrefix"
+      },
+      {
+        "name": "missing_prefix_wrong_method",
+        "comment": "A DID URI for a different method.",
+        "input_string": "did:other:3Yu9e55XiwG1UyLwh2ojPB2tUkZdJmpRv8gWf7jazngP",
+        "expected_error": "MissingPrefix"
+      },
+      {
+        "name": "missing_prefix_legacy_agf",
+        "comment": "The legacy pre-rename prefix `did:agf:` MUST NOT be accepted as equivalent to `did:agid:`. See SPEC.md §12.",
+        "input_string": "did:agf:3Yu9e55XiwG1UyLwh2ojPB2tUkZdJmpRv8gWf7jazngP",
+        "expected_error": "MissingPrefix"
+      },
+      {
+        "name": "missing_prefix_uppercase_method",
+        "comment": "DID method names are case-sensitive per W3C DID Core 1.0 §3.1; `DID:AGID:` is not the same as `did:agid:`.",
+        "input_string": "DID:AGID:2mDwJhrvWdJsqHAhRTQWpaLgWmnTZxEZJv6hnDmjiYtt",
+        "expected_error": "MissingPrefix"
+      },
+      {
+        "name": "wrong_length_empty_payload",
+        "comment": "Empty base58 payload after the prefix.",
+        "input_string": "did:agid:",
+        "expected_error": "WrongLength"
+      },
+      {
+        "name": "wrong_length_payload_too_long",
+        "comment": "Payload length exceeds 44 characters; cannot decode to exactly 32 bytes.",
+        "input_string": "did:agid:2mDwJhrvWdJsqHAhRTQWpaLgWmnTZxEZJv6hnDmjiYttExtraTrailingCharacters",
+        "expected_error": "WrongLength"
+      },
+      {
+        "name": "invalid_base58_ambiguous_chars",
+        "comment": "Contains characters explicitly excluded from the Bitcoin base58 alphabet (0, O, I, l).",
+        "input_string": "did:agid:O0Il",
+        "expected_error": "InvalidBase58"
+      },
+      {
+        "name": "invalid_base58_underscore",
+        "comment": "Underscore is not in the base58 alphabet.",
+        "input_string": "did:agid:invalid_underscore_payload",
+        "expected_error": "InvalidBase58"
+      },
+      {
+        "name": "invalid_base58_non_ascii_payload",
+        "comment": "Payload contains non-ASCII bytes; conforming parsers MUST reject before base58 decoding.",
+        "input_string": "did:agid:Михаил",
+        "expected_error": "InvalidBase58"
+      },
+      {
+        "name": "malformed_did_partial_garbage",
+        "comment": "Valid prefix immediately followed by punctuation outside the base58 alphabet.",
+        "input_string": "did:agid:!!!",
+        "expected_error": "InvalidBase58"
+      }
+    ]
+  }
 }

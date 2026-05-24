@@ -1,7 +1,8 @@
 //! Benchmarks for `ag_id` (Ag^id).
 
 use ag_id::{derive, DeriveDomain};
-use criterion::{black_box, criterion_group, criterion_main, Criterion, Throughput};
+use core::hint::black_box;
+use criterion::{criterion_group, criterion_main, Criterion, Throughput};
 
 /// Benchmark `derive` with various input sizes.
 fn bench_derive(c: &mut Criterion) {
