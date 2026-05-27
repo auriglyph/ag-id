@@ -10,12 +10,6 @@ source of truth that `test-vectors/v1.json` verifies. Any implementation that
 produces the same byte sequences from the same inputs is conformant; any that does
 not is not.
 
-> **Naming note.** The project was previously called `determin-id`. The new name is
-> `Ag^id` (display) / `ag_id` (Rust crate). The protocol prefix and URI scheme were
-> updated at the same time (`b"determin-id:v1:"` → `b"agid:v1:"` and `did:agf:` →
-> `did:agid:`). Identifiers minted under the old name are **not** interoperable
-> with `Ag^id` v1.
-
 ---
 
 ## 1. Notation
@@ -204,21 +198,8 @@ so callers can plan ahead.
 
 ---
 
-## 12. Compatibility with the legacy `did:agf:` form (informative)
 
-A pre-rename internal version of this protocol used:
-
-- `PREFIX = b"determin-id:v1:"` (15 bytes)
-- URI scheme `did:agf:`
-
-That form is **deprecated** and is not bit-compatible with `Ag^id` v1. No
-migration tooling is provided because no external clients depend on the legacy
-output. New implementations MUST NOT accept `did:agf:` URIs as equivalent to
-`did:agid:`.
-
----
-
-## 13. Security considerations
+## 12. Security considerations
 
 See [`SECURITY.md`](SECURITY.md) for the full threat model. Salient points:
 
@@ -233,7 +214,7 @@ See [`SECURITY.md`](SECURITY.md) for the full threat model. Salient points:
 
 ---
 
-## 14. Test vectors
+## 13. Test vectors
 
 See [`test-vectors/v1.json`](test-vectors/v1.json) for canonical inputs and
 outputs. The Rust reference implementation has an integration test
@@ -242,7 +223,7 @@ implementation; conforming re-implementations should ship an equivalent test.
 
 ---
 
-## 15. References
+## 14. References
 
 - BLAKE3 specification: <https://github.com/BLAKE3-team/BLAKE3-specs>
 - Base58 (Bitcoin variant): <https://en.bitcoin.it/wiki/Base58Check_encoding>

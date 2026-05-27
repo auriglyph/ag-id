@@ -8,12 +8,12 @@
     "uri_prefix": "did:agid:"
   },
   "domain_bytes": {
-    "User":     "0x01",
+    "User": "0x01",
     "Document": "0x02",
-    "Session":  "0x03",
-    "Device":   "0x04",
-    "Concept":  "0x05",
-    "Opaque":   "0x00 (reserved sentinel — never used to derive)"
+    "Session": "0x03",
+    "Device": "0x04",
+    "Concept": "0x05",
+    "Opaque": "0x00 (reserved sentinel \u2014 never used to derive)"
   },
   "vectors": [
     {
@@ -25,16 +25,8 @@
       "did_string": "did:agid:2mDwJhrvWdJsqHAhRTQWpaLgWmnTZxEZJv6hnDmjiYtt"
     },
     {
-      "name": "user_architect_at_auriglyph",
-      "domain": "User",
-      "domain_byte": "0x01",
-      "input_utf8": "architect@auriglyph.com",
-      "raw_hex": "f059a4033cab314f4f2e6bf324aab351e29a6265f7de02c28b8742e300903462",
-      "did_string": "did:agid:HBE8KJPc2ehjFFkY5tAd1dEBminESfjWMHed5VK26n5F"
-    },
-    {
       "name": "golden_v1_anchor",
-      "comment": "Stability anchor — MUST match across all v1.x releases. The Rust integration test tests/determinism.rs::did__derive__golden_input__matches_hardcoded_hex pins this raw_hex value.",
+      "comment": "Stability anchor \u2014 MUST match across all v1.x releases. The Rust integration test tests/determinism.rs::did__derive__golden_input__matches_hardcoded_hex pins this raw_hex value.",
       "domain": "User",
       "domain_byte": "0x01",
       "input_utf8": "agid:golden:v1",
@@ -52,16 +44,16 @@
     },
     {
       "name": "unicode_cyrillic",
-      "comment": "Hash is over UTF-8 bytes (\"Михаил\" → 0xd09c d0b8 d185 d0b0 d0b8 d0bb in UTF-8). Encoding identity is the caller's responsibility.",
+      "comment": "Hash is over UTF-8 bytes (\"\u041c\u0438\u0445\u0430\u0438\u043b\" \u2192 0xd09c d0b8 d185 d0b0 d0b8 d0bb in UTF-8). Encoding identity is the caller's responsibility.",
       "domain": "User",
       "domain_byte": "0x01",
-      "input_utf8": "Михаил",
+      "input_utf8": "\u041c\u0438\u0445\u0430\u0438\u043b",
       "raw_hex": "38f12866493850cbe71cbe622551bda534945321f7ed3ebd27364b986911fcf5",
       "did_string": "did:agid:4qH7WfFHC1fcaczryBD9mHXC1Jc8PDYcWGmwdNvVr7QY"
     },
     {
       "name": "domain_separation_user",
-      "comment": "Pair with `domain_separation_document` and `domain_separation_session` — same input, different domains, must produce different IDs.",
+      "comment": "Pair with `domain_separation_document` and `domain_separation_session` \u2014 same input, different domains, must produce different IDs.",
       "domain": "User",
       "domain_byte": "0x01",
       "input_utf8": "same-input",
@@ -98,7 +90,7 @@
       "comment": "1024 bytes of 0x00. Verifies that BLAKE3 is fed the bytes verbatim with no length-prefix tampering.",
       "domain": "Document",
       "domain_byte": "0x02",
-      "input_utf8": "(1024 bytes of 0x00 — see Rust generator tests/vector_export.rs)",
+      "input_utf8": "(1024 bytes of 0x00 \u2014 see Rust generator tests/vector_export.rs)",
       "raw_hex": "b0f561357d041b2220fbf570abb85966081db915b2b6480b83b5844236edb810",
       "did_string": "did:agid:Cummes8JKskjxa73rshacP3DTdvFo3eweuWGYcqvaTaw"
     }
@@ -128,13 +120,13 @@
       },
       {
         "name": "missing_prefix_legacy_agf",
-        "comment": "The legacy pre-rename prefix `did:agf:` MUST NOT be accepted as equivalent to `did:agid:`. See SPEC.md §12.",
-        "input_string": "did:agf:3Yu9e55XiwG1UyLwh2ojPB2tUkZdJmpRv8gWf7jazngP",
+        "comment": "An unrelated DID method prefix MUST NOT be accepted as equivalent to `did:agid:`.",
+        "input_string": "did:foo:3Yu9e55XiwG1UyLwh2ojPB2tUkZdJmpRv8gWf7jazngP",
         "expected_error": "MissingPrefix"
       },
       {
         "name": "missing_prefix_uppercase_method",
-        "comment": "DID method names are case-sensitive per W3C DID Core 1.0 §3.1; `DID:AGID:` is not the same as `did:agid:`.",
+        "comment": "DID method names are case-sensitive per W3C DID Core 1.0 \u00a73.1; `DID:AGID:` is not the same as `did:agid:`.",
         "input_string": "DID:AGID:2mDwJhrvWdJsqHAhRTQWpaLgWmnTZxEZJv6hnDmjiYtt",
         "expected_error": "MissingPrefix"
       },
@@ -165,7 +157,7 @@
       {
         "name": "invalid_base58_non_ascii_payload",
         "comment": "Payload contains non-ASCII bytes; conforming parsers MUST reject before base58 decoding.",
-        "input_string": "did:agid:Михаил",
+        "input_string": "did:agid:\u041c\u0438\u0445\u0430\u0438\u043b",
         "expected_error": "InvalidBase58"
       },
       {

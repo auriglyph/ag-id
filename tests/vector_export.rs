@@ -30,11 +30,6 @@ const VECTORS: &[V] = &[
         input: b"alice@example.com",
     },
     V {
-        name: "user_architect_at_auriglyph",
-        domain: DeriveDomain::User,
-        input: b"architect@auriglyph.com",
-    },
-    V {
         name: "golden_v1_anchor",
         domain: DeriveDomain::User,
         input: b"agid:golden:v1",

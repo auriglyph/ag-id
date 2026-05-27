@@ -10,8 +10,8 @@
 //! ```rust
 //! use ag_id::{DeriveDomain, Did};
 //!
-//! let id = Did::derive(DeriveDomain::User, b"architect@auriglyph.com");
-//! let id2 = Did::derive(DeriveDomain::User, b"architect@auriglyph.com");
+//! let id = Did::derive(DeriveDomain::User, b"alice@example.com");
+//! let id2 = Did::derive(DeriveDomain::User, b"alice@example.com");
 //! assert_eq!(id, id2); // always
 //! # #[cfg(feature = "std")]
 //! assert!(id.to_did_string().starts_with("did:agid:"));

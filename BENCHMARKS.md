@@ -20,13 +20,13 @@ hardware.
 
 | Field | Value |
 |---|---|
-| Date (UTC) | 2026-05-06T07:06Z (pre-rename, protocol-prefix-equivalent measurement) |
-| Crate version | `ag_id 0.1.0` (formerly `determin-id 0.1.0`) |
+| Date (UTC) | 2026-05-27T05:01Z |
+| Crate version | `ag_id 0.1.0` |
 | Dependency | `blake3 1.8.5`, default features (SIMD enabled) |
-| CPU | AMD Ryzen 9 7900X, 12 cores / 24 threads |
-| CPU SIMD available | SSE4.1, SSE4.2, AVX2, AVX-512F, BMI2 |
-| OS / kernel | Linux 6.17.0-23-generic, x86\_64 |
-| `rustc` | 1.94.0 (4a4ef493e 2026-03-02), host `x86_64-unknown-linux-gnu` |
+| CPU | Apple M2, 8 cores |
+| CPU SIMD available | NEON (Apple Silicon — no AVX) |
+| OS / kernel | Darwin 25.5.0, arm64 (macOS 26.5) |
+| `rustc` | 1.95.0 (59807616e 2026-04-14), host `aarch64-apple-darwin` |
 | Profile | `release` (codegen-units default, no `RUSTFLAGS`) |
 
 The CPU was not pinned, frequency scaling was left at default, and the
@@ -39,23 +39,24 @@ quiesced host with `cpupower frequency-set --governor performance`.
 
 | Input size | Median time | Throughput |
 |---:|---:|---:|
-| 16 B    | 67.21 ns | 227.0 MiB/s |
-| 64 B    | 110.29 ns | 553.4 MiB/s |
-| 256 B   | 241.82 ns | 1.01 GiB/s |
-| 1024 B  | 833.44 ns | 1.14 GiB/s |
-| 65536 B | 9.96 µs   | 6.13 GiB/s |
+| 16 B    | 91.59 ns | 166.60 MiB/s |
+| 64 B    | 162.97 ns | 374.51 MiB/s |
+| 256 B   | 374.76 ns | 651.46 MiB/s |
+| 1024 B  | 1.30 µs | 749.80 MiB/s |
+| 65536 B | 37.32 µs | 1.64 GiB/s |
 
-Asymptote is BLAKE3's chunked SIMD path; small-input cost is dominated by
-hasher init and the 8-byte prefix update.
+Asymptote is BLAKE3's chunked SIMD path (NEON on Apple Silicon); small-input
+cost is dominated by hasher init and the 8-byte prefix update. AVX-512
+hardware shows higher asymptotic throughput; see footnote on hardware spread.
 
 ### `display/did_string` — `Did → "did:agid:<base58>"`
 
 | Operation | Median time |
 |---:|---:|
-| `Did::to_string()` (≤44-char base58 + `did:agid:` prefix) | 594.60 ns |
+| `Did::to_string()` (≤44-char base58 + `did:agid:` prefix) | 1.25 µs |
 
 The base58 encoder is the dominant cost — it does ~170 modulo-58 operations
-on a 44-digit accumulator. If you only need byte equality (`Did::eq`,
+on a 44-digit accumulator (~2× longer here than on AVX-512 hosts). If you only need byte equality (`Did::eq`,
 `as_bytes`, hex), do not pay for the DID string.
 
 ## Reproducing
@@ -68,9 +69,9 @@ cargo bench --bench throughput
 To compare against this baseline:
 
 ```sh
-git checkout e126a1009599967293aa5f1e7101a255b1ad7f60
+# To pin a baseline for comparison across changes:
 cargo bench --bench throughput -- --save-baseline reference
-git checkout your-branch
+# (then later)
 cargo bench --bench throughput -- --baseline reference
 ```
 

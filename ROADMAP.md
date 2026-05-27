@@ -77,4 +77,3 @@ Things we have explicitly decided NOT to do, with reasons:
 - **Truncation.** Showing fewer than the full 32 bytes of meaning is a footgun (collision-grindable). We will never expose a "short ID" API.
 - **Random fallback.** Some libraries fall back to randomness if input is empty or "weak". `Ag^id` does the boring thing: empty input is well-defined and produces a stable hash like any other input.
 - **Multiple wire formats per protocol version.** One canonical form per version (v1 → `did:agid:<base58>`). Multibase-style "encoder of the day" undermines determinism.
-- **`did:agf:` legacy compatibility.** The pre-rename internal version of this protocol used `did:agf:` and a different protocol prefix. No external clients depended on it, so we do not carry it forward.

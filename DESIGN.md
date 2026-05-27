@@ -76,7 +76,7 @@ Two communities matter:
 - **W3C DID** — the `did:method:` URI scheme is the most widely adopted way to express decentralised identifiers on the web. Conforming to it makes `Ag^id` legible to JSON-LD tooling, verifiable-credential libraries, and DID resolvers without modification.
 - **URN registry** — `urn:agid:` would also work but is less idiomatic for new identifier schemes in 2026.
 
-`agid` stands for AuriGlyph IDentifier (the project family is AuriGlyph; this crate is the identifier primitive). The full method spec for `did:agid:` is in this document and `SPEC.md`; W3C registration is on the roadmap (see `ROADMAP.md`).
+`agid` stands for "agnostic identifier" — the DID method name for this protocol. The full method spec for `did:agid:` is in this document and `SPEC.md`; W3C registration is on the roadmap (see `ROADMAP.md`).
 
 ### `Domain::Opaque` and parsed `Did`s
 

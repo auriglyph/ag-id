@@ -38,27 +38,6 @@ frozen; new variants get new bytes). Bug fixes that do not change output are
 First public release of `ag_id` (display name **Ag^id**), under the
 crate name `ag_id` on `github.com/auriglyph/ag-id`.
 
-### Project rename (relative to internal `determin-id` predecessor)
-
-This release supersedes an internal-only crate previously named
-`determin-id`. Identifiers minted under the old name are intentionally
-**not** bit-compatible with `ag_id` v1 — both the BLAKE3 protocol prefix
-and the DID URI scheme were rotated when the project was renamed.
-
-| Field | Old (internal `determin-id`) | New (`ag_id` v1) |
-|---|---|---|
-| Crate name | `determin-id` | `ag_id` |
-| Display name | — | `Ag^id` |
-| BLAKE3 protocol prefix | `b"determin-id:v1:"` (15 B) | `b"agid:v1:"` (8 B) |
-| DID URI prefix | `did:agf:` | `did:agid:` |
-| Homepage | (n/a, internal) | `https://auriglyph.com/projects/ag_id` |
-| Test vectors | regenerated for the new prefix | see [`test-vectors/v1.json`](test-vectors/v1.json) |
-
-The old `determin-id` artefacts were never published to crates.io, never
-deployed externally, and have no migration path to `ag_id`. New
-implementations MUST NOT accept `did:agf:` URIs as equivalent to
-`did:agid:`. See [`SPEC.md` §12](SPEC.md#12-compatibility-with-the-legacy-didagf-form-informative)
-for the legacy form's status.
 
 ### Added
 
