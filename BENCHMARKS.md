@@ -6,7 +6,7 @@ hardware.
 
 ## Methodology
 
-- Harness: [`criterion`](https://crates.io/crates/criterion) 0.5, 100 samples
+- Harness: [`criterion`](https://crates.io/crates/criterion) 0.8, 100 samples
   per case, 3 s warmup, 5 s measurement window (criterion defaults).
 - Workload: `derive(DeriveDomain::User, &[0xAB; N])` for `N ∈ {16, 64, 256, 1024, 65536}`,
   plus `Did::to_string()` (the `did:agid:<base58>` formatter).

@@ -73,8 +73,7 @@ access to `K_deployment`.
 secret, which contradicts the crate's zero-state invariant. The wrapper
 belongs at the caller layer.
 
-A worked example will be added under `examples/hmac_wrapping.rs` —
-tracked as `H-4` in [`docs/CLAIMS_LEDGER.md`](docs/CLAIMS_LEDGER.md).
+A worked example is available under [`examples/hmac_wrapping.rs`](examples/hmac_wrapping.rs).
 
 ## Reporting
 

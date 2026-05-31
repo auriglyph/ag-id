@@ -127,8 +127,9 @@ def derive_raw(domain_byte: int, payload: bytes) -> bytes:
     """The single hash call defined in SPEC.md §5.
 
     Raises ReservedDomainError if `domain_byte` is 0x00 — that byte is reserved
-    for `Domain::Opaque` and must never be used as hash input. This mirrors
-    `ag_id::Did::try_derive` returning `Error::ReservedDomain`.
+    and must never be used as hash input. In the Rust reference this is
+    enforced at construction: `DeriveDomain::custom(0)` returns
+    `Err(Error::ReservedDomain)`, so a 0x00 domain can never reach this call.
     """
     if domain_byte == 0x00:
         raise ReservedDomainError("domain_byte 0x00 is reserved (SPEC.md §3)")

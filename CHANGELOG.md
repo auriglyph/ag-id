@@ -20,20 +20,15 @@ Adding new `Domain` variants is **MINOR** (the byte assignments above are
 frozen; new variants get new bytes). Bug fixes that do not change output are
 **PATCH**.
 
-## [Unreleased]
-
-### Changed
-
-- `Did::derive`, `derive`, and `derive_str` now accept `DeriveDomain` instead
-  of `Domain`, so the parsed-value sentinel `Domain::Opaque` cannot be used as
-  a derivation domain.
-
-### Added
-
-- `DeriveDomain` — derivation-only domain type with built-in domains and
-  `DeriveDomain::custom(byte) -> Result<_, Error>` for non-zero custom bytes.
-
 ## [0.1.0] — 2026-05-10
+
+### Derivation API
+
+- `Did::derive`, `derive`, and `derive_str` accept `DeriveDomain`, a
+  derivation-only domain type with built-in domains and
+  `DeriveDomain::custom(byte) -> Result<_, Error>` for non-zero custom bytes.
+  The parsed-value sentinel `Domain::Opaque` cannot be used as a derivation
+  domain.
 
 First public release of `ag_id` (display name **Ag^id**), under the
 crate name `ag_id` on `github.com/auriglyph/ag-id`.

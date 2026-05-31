@@ -165,7 +165,8 @@ Read these before using `Ag^id` in security-sensitive contexts.
 - **No deletion, no rotation.** A `Did` is a pure function of `(domain, input)`.
   If `input` is sensitive (e.g. an email address), the resulting `Did` is a
   stable pseudonym for that input forever. There is no server-side
-  invalidation. Hash inputs you control, not raw PII, when this matters.
+  invalidation. For low-entropy PII, wrap input under a deployment secret first
+  (see [`examples/hmac_wrapping.rs`](examples/hmac_wrapping.rs)).
 - **Custom domain separation is enforced by discipline.**
   `DeriveDomain::custom(b)` lets callers pick any non-zero byte; if two systems
   pick the same byte for different semantics, their IDs collide by design.

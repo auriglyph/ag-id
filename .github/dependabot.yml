@@ -1,6 +1,6 @@
 # Dependabot configuration — Auriglyph
 # Watches: cargo deps + GitHub Actions
-# Auto-PRs grouped by minor+patch для меньшего шума.
+# Auto-PRs grouped by minor+patch to reduce noise.
 
 version: 2
 updates:

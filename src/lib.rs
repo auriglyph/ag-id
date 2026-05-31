@@ -1,4 +1,5 @@
 #![cfg_attr(not(feature = "std"), no_std)]
+#![forbid(unsafe_code)]
 #![deny(clippy::all)]
 #![warn(missing_docs)]
 #![doc = include_str!("../README.md")]

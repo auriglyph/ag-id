@@ -51,6 +51,9 @@ name = "basic"
 [[example]]
 name = "parsing"
 
+[[example]]
+name = "hmac_wrapping"
+
 [package.metadata.docs.rs]
 all-features = true
 rustdoc-args = ["--cfg", "docsrs"]
