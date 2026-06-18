@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "status": "pass",
+  "vectors_ref": "test-vectors/v1.json",
+  "python_witness": "conformance/witnesses/python/agid_v1_witness.py",
+  "ci_workflow": ".github/workflows/ci.yml",
+  "evaluated": {
+    "date": "2026-06-18",
+    "git_rev": "4b59484"
+  }
+}

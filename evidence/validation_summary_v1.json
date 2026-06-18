@@ -1,0 +1,21 @@
+{
+  "schema": "auriglyph.validation_summary/v1",
+  "repo": "ag-id",
+  "evaluated": {
+    "date": "2026-06-18",
+    "git_rev": "4b59484",
+    "toolchain": "rustc 1.95.0 (59807616e 2026-04-14)"
+  },
+  "tests": {
+    "command": "cargo test --workspace",
+    "passed": 42,
+    "failed": 0,
+    "status": "pass"
+  },
+  "clippy": {
+    "command": "cargo clippy --workspace --all-targets -- -D warnings",
+    "status": "pass"
+  },
+  "git_rev": "8edc50e3fb8663247c45f2ff50d7cddfb67682e2",
+  "status": "pass"
+}

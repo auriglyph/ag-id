@@ -1,0 +1,39 @@
+{
+  "schema": "auriglyph.release_gate/v1",
+  "repo": "ag-id",
+  "status": "pass",
+  "blockers": [
+    {
+      "id": "I.1",
+      "title": "TRUTH_TABLE.md is placeholder",
+      "status": "resolved",
+      "evidence": ["docs/TRUTH_TABLE.md"]
+    },
+    {
+      "id": "I.2",
+      "title": "Missing validation summary",
+      "status": "resolved",
+      "evidence": ["evidence/validation_summary_v1.json"]
+    },
+    {
+      "id": "I.3",
+      "title": "Missing cargo deny gate",
+      "status": "resolved",
+      "evidence": ["scripts/cargo_deny_gate.sh", "deny.toml"]
+    }
+  ],
+  "honest_limits": [
+    "Cross-platform CI matrix is not yet exercised beyond the repository's current Linux target in repo gates.",
+    "W3C DID method registration is not complete.",
+    "External third-party audit has not been completed."
+  ],
+  "passing": [
+    "docs/CLAIMS_LEDGER.md",
+    "docs/TRUTH_TABLE.md",
+    "evidence/validation_summary_v1.json",
+    "evidence/conformance_v1.json",
+    "scripts/validation_gate.sh",
+    "scripts/claims_ledger_gate.sh",
+    "scripts/cargo_deny_gate.sh"
+  ]
+}
